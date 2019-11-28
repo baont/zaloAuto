@@ -2,6 +2,9 @@ import selenium
 import time
 import base64
 import requests
+import urllib.request
+import os
+import atexit
 # Using Chrome to access web
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -11,6 +14,11 @@ from selenium.webdriver.common.by import By
 from flask import Flask
 from flask import jsonify
 from flask import request
+from flask import send_file
+from flask import Response
+from flask import redirect
+from random import randrange
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 chrome_options = Options()
@@ -21,7 +29,7 @@ driver = webdriver.Chrome(executable_path='.\chromedriver.exe')
 driver.get('https://chat.zalo.me/')
 print("Listening!")
 @app.route('/getavatar')
-def say_hello():
+def getAvatar():
     userPhoneNumb = request.args.get('phone')
     if not userPhoneNumb:
         return 'Need api param!'
@@ -45,11 +53,7 @@ def say_hello():
                 tokens = backgroundUrlString.split('url("')
                 if tokens:
                     backgroundUrlString = tokens[1].replace('")', '')
-                    return jsonify(
-                        url=backgroundUrlString,
-                        base64=base64.b64encode(
-                            requests.get(backgroundUrlString).content)
-                    )
+                    return Response(requests.get(backgroundUrlString), mimetype="image/jpg")
             return 'This user has no avatar!'
         except:
             closeBtn =  WebDriverWait(driver, 5).until(
@@ -57,4 +61,14 @@ def say_hello():
             closeBtn.click()
             return 'Invalid phone number!'
     except:
-        return 'Login need'
+        return 'Login needed'
+
+# for schedule test
+# def callApi():
+#     url = 'http://localhost:5000/getavatar?phone=038310405' + str(randrange(10))
+#     response = requests.get(url)
+#     print(response)
+# sched = BackgroundScheduler(daemon=True)
+# sched.add_job(callApi,'interval',seconds=5)
+# sched.start()
+
