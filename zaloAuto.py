@@ -16,7 +16,6 @@ from flask import jsonify
 from flask import request
 from flask import send_file
 from flask import Response
-from flask import redirect
 from random import randrange
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -47,7 +46,8 @@ def getAvatar():
                 "background-image")
             backgroundUrlString = backgroundUrlString.strip()
             closeBtn =  WebDriverWait(driver, 2).until(
-                EC.presence_of_element_located((By.XPATH, '//*[@id="app-page"]/div[4]/div/div/div[1]/span[2]')))
+                EC.presence_of_element_located((By.XPATH, '//*[@id="app-page"]/div[3]/div/div/div[1]/span[2]')))
+            print(closeBtn)
             closeBtn.click()
             if backgroundUrlString:
                 tokens = backgroundUrlString.split('url("')
@@ -64,11 +64,12 @@ def getAvatar():
         return 'Login needed'
 
 # for schedule test
+
 # def callApi():
-#     url = 'http://localhost:5000/getavatar?phone=038310405' + str(randrange(10))
+#     url = 'http://localhost:5001/getavatar?phone=038310405' + str(randrange(10))
 #     response = requests.get(url)
 #     print(response)
 # sched = BackgroundScheduler(daemon=True)
-# sched.add_job(callApi,'interval',seconds=5)
+# sched.add_job(callApi,'interval',seconds=10)
 # sched.start()
 
