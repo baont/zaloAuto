@@ -31,7 +31,7 @@ print("Listening!")
 
 def closeSearchBox():
     closeBtn = WebDriverWait(driver, 1).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, '#app-page > div.modal.animated.fadeIn.appear > div > div > div.modal-dialog-title.flx.flx-sp-btw > span.modal-close')))
+        EC.presence_of_element_located((By.CLASS_NAME, 'modal-close')))
     closeBtn.click()
 
 
