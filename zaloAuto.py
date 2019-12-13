@@ -29,14 +29,9 @@ driver.get('https://chat.zalo.me/')
 print("Listening!")
 
 
-def closeSearchBox():
-    closeBtn = WebDriverWait(driver, 1).until(
-        EC.presence_of_element_located((By.CLASS_NAME, 'modal-close')))
-    closeBtn.click()
-
-
 @app.route('/getavatar')
 def getAvatar():
+    driver.refresh()
     userPhoneNumb = request.args.get('phone')
     if not userPhoneNumb:
         return 'Need api param!'
@@ -49,12 +44,6 @@ def getAvatar():
             inputForm = driver.find_element_by_id("findFriend")
         except:
             return "Login needed"
-        try:
-            closeSearchBox()
-        except:
-            return "Cannot detect close button"
-        inviteBtn = driver.find_element_by_id("inviteBtn")
-        inviteBtn.click()
     inputForm = None
     try:
         inputForm = driver.find_element_by_id("findFriend")
@@ -74,29 +63,17 @@ def getAvatar():
         try:
             WebDriverWait(driver, 1).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#lan-list > div > div:nth-child(1) > div > div')))
-            try:
-                closeSearchBox()
-            except:
-                return "Cannot detect close button"
             return "This phone number had been not registered yet"
         except:
             try:
                 WebDriverWait(driver, 1).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, '#findFriend > div:nth-child(2) > div')))
-                try:
-                    closeSearchBox()
-                except:
-                    return "Cannot detect close button"
                 return "This phone number had been not registered yet"
             except:
                 return "This user has no avatar!"
     backgroundUrlString = userAvatar.value_of_css_property(
         "background-image")
     backgroundUrlString = backgroundUrlString.strip()
-    try:
-        closeSearchBox()
-    except:
-        return "Cannot detect close button"
     if backgroundUrlString:
         tokens = backgroundUrlString.split('url("')
         if tokens:
