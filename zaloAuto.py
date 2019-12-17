@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from flask import Flask
 from flask import request
 from flask import Response
+import time
 
 app = Flask(__name__)
 chrome_options = Options()
@@ -19,12 +20,21 @@ driver.implicitly_wait(10) # seconds
 # Open the website
 driver.get('https://chat.zalo.me/')
 print("Listening!")
+isProcessing = False
+
 
 @app.route('/getavatar')
 def getAvatar():
+    global isProcessing
+    while isProcessing:
+        print('wait for finish')
+        time.sleep(1)
+
+    isProcessing = True
     driver.refresh()
     userPhoneNumb = request.args.get('phone')
     if not userPhoneNumb:
+        isProcessing = False
         return 'Need api param!'
 
     try:
@@ -34,17 +44,20 @@ def getAvatar():
         try:
             inputForm = driver.find_element_by_id("findFriend")
         except:
+            isProcessing = False
             return "Login needed"
     inputForm = None
     try:
         inputForm = driver.find_element_by_id("findFriend")
     except:
+        isProcessing = False
         return "Cannot find input form"
     try:
         inputField = inputForm.find_elements_by_tag_name("input")
         inputField[0].clear()
         inputField[0].send_keys(userPhoneNumb + '\n')
     except:
+        isProcessing = False
         return "Cannot find input field"
     userAvatar = None
     try:
@@ -54,13 +67,16 @@ def getAvatar():
         try:
             WebDriverWait(driver, 1).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#lan-list > div > div:nth-child(1) > div > div')))
+            isProcessing = False
             return "This phone number had been not registered yet"
         except:
             try:
                 WebDriverWait(driver, 1).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, '#findFriend > div:nth-child(2) > div')))
+                isProcessing = False
                 return "This phone number had been not registered yet"
             except:
+                isProcessing = False
                 return "This user has no avatar!"
     backgroundUrlString = userAvatar.value_of_css_property(
         "background-image")
@@ -69,7 +85,9 @@ def getAvatar():
         tokens = backgroundUrlString.split('url("')
         if tokens:
             backgroundUrlString = tokens[1].replace('")', '')
+            isProcessing = False
             return Response(requests.get(backgroundUrlString), mimetype="image/jpg")
+    isProcessing = False
     return 'This user has no avatar!'
 
 if __name__ == "__main__":
