@@ -28,3 +28,4 @@ if __name__ == '__main__':
     # futures is now a list of 10 futures.
     for future in futures:
         print(future.get().text)
+        print('----------------------------------')
