@@ -96,7 +96,7 @@ def refreshPage():
     driver.refresh()
 # Shedule job refresh page every 10 minute
 sched = BackgroundScheduler(daemon=True)
-sched.add_job(refreshPage,'interval', min=10)
+sched.add_job(refreshPage,'interval', minutes=10)
 sched.start()
 if __name__ == "__main__":
     app.run()
