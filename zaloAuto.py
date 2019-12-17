@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from flask import Flask
 from flask import request
 from flask import Response
+from apscheduler.schedulers.background import BackgroundScheduler
 import time
 
 app = Flask(__name__)
@@ -83,12 +84,19 @@ def getAvatar():
     backgroundUrlString = backgroundUrlString.strip()
     if backgroundUrlString:
         tokens = backgroundUrlString.split('url("')
-        if tokens:
+        if len(tokens) > 1:
             backgroundUrlString = tokens[1].replace('")', '')
             isProcessing = False
             return Response(requests.get(backgroundUrlString), mimetype="image/jpg")
     isProcessing = False
     return 'This user has no avatar!'
 
+# Refresh page
+def refreshPage():
+    driver.refresh()
+# Shedule job refresh page every 10 minute
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(refreshPage,'interval', min=10)
+sched.start()
 if __name__ == "__main__":
     app.run()
