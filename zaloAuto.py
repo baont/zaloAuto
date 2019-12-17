@@ -1,10 +1,4 @@
-import selenium
-import time
-import base64
 import requests
-import urllib.request
-import os
-import atexit
 # Using Chrome to access web
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -12,22 +6,19 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from flask import Flask
-from flask import jsonify
 from flask import request
-from flask import send_file
 from flask import Response
-from random import randrange
-from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 chrome_options = Options()
 # chrome_options.add_argument("--incognito")
 chrome_options.add_argument("--window-size=1920x1080")
-driver = webdriver.Chrome(executable_path='.\chromedriver.exe')
+# driver = webdriver.Chrome(executable_path='.\chromedriver.exe')
+driver = webdriver.Chrome()
+driver.implicitly_wait(10) # seconds
 # Open the website
 driver.get('https://chat.zalo.me/')
 print("Listening!")
-
 
 @app.route('/getavatar')
 def getAvatar():
@@ -81,15 +72,5 @@ def getAvatar():
             return Response(requests.get(backgroundUrlString), mimetype="image/jpg")
     return 'This user has no avatar!'
 
-
 if __name__ == "__main__":
     app.run()
-# for schedule test
-
-# def callApi():
-#     url = 'http://localhost:5001/getavatar?phone=038310405' + str(randrange(10))
-#     response = requests.get(url)
-#     print(response)
-# sched = BackgroundScheduler(daemon=True)
-# sched.add_job(callApi,'interval',seconds=10)
-# sched.start()
